@@ -1,4 +1,4 @@
-package
+package com.redique
 {
 	
 	public class Job implements IJob
@@ -12,30 +12,18 @@ package
 		// # This job's associated payload object.
 		public var payload:Object;
 		
-		public funciton Job(queue:String, payload:Object)	
+		public function Job(queue:String, payload:Object)	
 		{ 
 			this.queue = queue;
 			this.payload = payload;
 		}
-		
 		// Creates a job by placing it on a queue. Expects a string queue
-    // name, a string class name, and an optional array of arguments to
-   	// pass to the class' `perform` method.
+    	// name, a string class name, and an optional array of arguments to
+   		// pass to the class' `perform` method.
 
-    // Raises an exception if no queue or class is given.
-		public static function create(queue:String, klass, ... args):void
+    	// Raises an exception if no queue or class is given.
+		public static function create(queue:String, klass:Class, ... args):void
 		{
-			if ( queue == '' || queue == null )
-			{
-				throw new Error ("Jobs must be placed onto a queue")
-			}
-			
-			if (klass == null )
-			{
-				throw new Error("Jobs must be given a class.")
-			}
-			
-			Resque.push(queue, klass.toString(), args);
 		}
 		/**
 		* Removes a job from a queue. Expects a string queue name, a string
@@ -63,24 +51,9 @@ package
 		* before processing.
 		*
 		**/
-		public static function destroy(queue:String, klass, ... args):int
+		public static function destroy(queue:String, klass:Class, ... args):int
 		{
-			var _klass:String = klass.toString();
-			queue = "queue:" + queue;
-			
-			var _destroyed:int = 0;
-			/*
-			redis.lrange(queue, 0, -1).each do |string|
-        json   = decode(string)
-
-        match  = json['class'] == klass
-        match &= json['args'] == args unless args.empty?
-
-        if match
-          destroyed += redis.lrem(queue, 0, string).to_i
-        end
-      end
-			*/
+			var _destroyed:int;
 			return _destroyed;
 		}
 		
@@ -89,7 +62,7 @@ package
 		* if any jobs are available. If not, returns null.
 		*
 		**/
-		public static function reserve(queue):void
+		public static function reserve(queue:String):void
 		{
 		}
 		
@@ -99,10 +72,9 @@ package
 		* arguments given in the payload
 		*
 		**/
-		public perform(... args):void
+		public function perform(... args):void
 		{			
 		}
-		
 		
 	}
 }

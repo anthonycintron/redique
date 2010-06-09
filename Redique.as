@@ -1,5 +1,6 @@
-package 
+package com.redique
 {
+	import com.codeazur.as3redis.*;
 	
 	public class Redique
 	{
@@ -24,7 +25,7 @@ package
 			// Job.reserve
 		}
 		
-		public function redis(server:ServerConfig):void
+		public function redis(host:String="127.0.0.1", port:int=6379):void
 		{
 			//Redis
 		}
@@ -34,11 +35,11 @@ package
 			// return Worker.all
 		}
 		
-		public function push(queue:Queue,):void
+		public static function push(queue:Queue):void
 		{
 		}
 		
-		public function pop(queue:Queue):void
+		public static function pop(queue:Queue):void
 		{
 		}
 	
