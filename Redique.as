@@ -6,6 +6,8 @@ package com.redique
 	
 	public class Redique
 	{
+		public var queues:String;
+		
 		private var redis:Redis;
 		
 		public function enqueue(job:Job, ... args):void
@@ -56,7 +58,7 @@ package com.redique
 		 */
 		public function push(queue:String, item:Object):void
 		{
-			// watch_queue(queue)
+			watchQueue(queue)
 			redis.sendRPUSH("queue:"+queue, Helpers.encode(item));
 		}
 		/**
@@ -65,7 +67,18 @@ package com.redique
 		 */
 		public function pop(queue:String):void
 		{
-		//	Helpers.decode(redis.sendLPOP("queue:"+queue));
+			redis.sendLPOP("queue:"+queue);
+		}
+		
+		
+		public function size(queue:String):void
+		{
+			redis.sendLLEN("queue:"+queue);
+		}
+		
+		private function watchQueue(queue:String):void
+		{
+			redis.sendSADD(queues, queue);
 		}
 	
 	}
