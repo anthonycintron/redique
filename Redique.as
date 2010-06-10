@@ -2,13 +2,11 @@ package com.redique
 {
 	import com.codeazur.as3redis.*;
 	import com.codeazur.as3redis.events.RedisMonitorDataEvent;
+	
+	
 	public class Redique
 	{
-		private var _redis:Redis;
-		
-		public function Redique()
-		{
-		}
+		private var redis:Redis;
 		
 		public function enqueue(job:Job, ... args):void
 		{
@@ -25,14 +23,14 @@ package com.redique
 			// Job.reserve
 		}
 		
-		public function redis(host:String="127.0.0.1", port:int=6379):void
+		public function startRedis(host:String="127.0.0.1", port:int=6379):void
 		{
-			_redis = new Redis(host, port);
+			redis = new Redis(host, port);
 			
-			_redis.sendMONITOR().addSimpleResponder( 
+			redis.sendMONITOR().addSimpleResponder( 
 				function(cmd:RedisCommand):void
 				{
-					_redis.addEventListener(RedisMonitorDataEvent.MONITOR_DATA, monitorDataHandler);
+					redis.addEventListener(RedisMonitorDataEvent.MONITOR_DATA, monitorDataHandler);
 				}
 			 );
 		}
@@ -52,12 +50,22 @@ package com.redique
 			// return Worker.all
 		}
 		
-		public static function push(queue:Queue):void
+		/**
+		 * Pushes a job onto a queue. Queue name should be a string and the
+		 * item should be any JSON-able Object.
+		 */
+		public function push(queue:String, item:Object):void
 		{
+			// watch_queue(queue)
+			redis.sendRPUSH("queue:"+queue, Helpers.encode(item));
 		}
-		
-		public static function pop(queue:Queue):void
+		/**
+		 * Pops a job off a queue. Queue name should be a string
+		 * Returns an Object
+		 */
+		public function pop(queue:String):void
 		{
+		//	Helpers.decode(redis.sendLPOP("queue:"+queue));
 		}
 	
 	}
