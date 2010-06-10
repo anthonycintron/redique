@@ -3,12 +3,14 @@ package com.redique
 	import com.codeazur.as3redis.*;
 	import com.codeazur.as3redis.events.RedisMonitorDataEvent;
 	
+	import flash.events.EventDispatcher;
+	import flash.events.Event;
 	
-	public class Redique
+	public class Redique extends EventDispatcher
 	{
 		public var queues:String;
 		
-		private var redis:Redis;
+		public var redis:Redis;
 		
 		public function enqueue(job:Job, ... args):void
 		{
@@ -28,13 +30,13 @@ package com.redique
 		public function startRedis(host:String="127.0.0.1", port:int=6379):void
 		{
 			redis = new Redis(host, port);
-			
 			redis.sendMONITOR().addSimpleResponder( 
 				function(cmd:RedisCommand):void
 				{
 					redis.addEventListener(RedisMonitorDataEvent.MONITOR_DATA, monitorDataHandler);
 				}
 			 );
+			dispatchEvent(new Event("rediqueReady"));
 		}
 		
 		private function monitorDataHandler(event:RedisMonitorDataEvent):void
