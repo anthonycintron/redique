@@ -1,10 +1,18 @@
 package com.redique
 {
-	
+	import flash.utils.getQualifiedClassName;
+	/**
+	 * A Redique Job represents a unit of work. Each job lives on a
+	 * single queue and has an associated payload object. The payload
+	 * is a hash with two attributes: `class` and `args`. The `class` is
+	 * the name of the Ruby class which should be used to run the
+`	 * job. The `args` are an array of arguments which should be passed
+	 * to the class's `perform` class-level method.
+	 */
 	public class Job implements IJob
 	{
 		// The worker object which is currently processing this job.
-		public var worker:String;
+		public var worker:Object;
 		
 		//This job's associated payload object.
 		public var queue:String
@@ -12,19 +20,35 @@ package com.redique
 		// # This job's associated payload object.
 		public var payload:Object;
 		
-		public function Job(queue:String, payload:Object)	
+		public var redique:Redique;
+		
+		private var klass:Object;
+		
+		public function Job(queue:String, klass:Object, ... args)	
 		{ 
 			this.queue = queue;
-			this.payload = payload;
+			this.payload = args;
+			this.klass = klass;
 		}
-		// Creates a job by placing it on a queue. Expects a string queue
-    	// name, a string class name, and an optional array of arguments to
-   		// pass to the class' `perform` method.
+		
+		/**
+		 * Creates a job by placing it on a queue. Expects a string queue
+     * name, a string class name, and an optional array of arguments to
+   	 * pass to the class' `perform` method.
 
-    	// Raises an exception if no queue or class is given.
-		public static function create(queue:String, klass:Class, ... args):void
+     * Raises an exception if no queue or class is given.
+		 */
+		public function create(... args):void
 		{
+			if ( queue.length == 0 )
+				throw new Error("Jobs must be placed onto a queue.");
+			
+			if ( klass == null )
+				throw new Error("Jobs must be given a class.");
+
+			redique.push( queue, klass );
 		}
+		
 		/**
 		* Removes a job from a queue. Expects a string queue name, a string
 		* class name, and, optionally, args.
@@ -62,8 +86,9 @@ package com.redique
 		* if any jobs are available. If not, returns null.
 		*
 		**/
-		public static function reserve(queue:String):void
+		public function reserve(queue:String):void
 		{
+		 	redique.pop(queue);
 		}
 		
 		/**
@@ -73,7 +98,8 @@ package com.redique
 		*
 		**/
 		public function perform(... args):void
-		{			
+		{
+			trace("Job.perform()")
 		}
 		
 	}
